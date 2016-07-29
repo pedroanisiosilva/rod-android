@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingLeft="10dp">
+
+    <LinearLayout
+        android:id="@+id/kmAndTime"
+        android:layout_width="match_parent"
+        android:layout_height="73dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/runKMTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="roboto"
+            android:text="24"
+            android:textColor="@color/jet"
+            android:textSize="55dip"
+            android:paddingLeft="15dp"
+            android:layout_gravity="bottom" />
+
+        <TextView
+            android:id="@+id/runMetersTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical|bottom"
+            android:fontFamily="roboto"
+            android:paddingLeft="3dp"
+            android:text=",25"
+            android:textColor="@color/jet"
+            android:textSize="14dip" />
+
+        <TextView
+            android:id="@+id/kmlabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical|bottom"
+            android:fontFamily="roboto"
+            android:paddingLeft="5dp"
+            android:text="km"
+            android:textColor="@color/aluminum"
+            android:textSize="22dip" />
+
+        <LinearLayout
+            android:id="@+id/teste"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:paddingRight="15dp">
+
+            <ImageView
+                android:id="@+id/runFlagImg"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:gravity="right"
+                android:src="@mipmap/run_or_die_principal_logo"
+                android:paddingRight="15dp" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/runTimeAgoTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="roboto"
+        android:paddingLeft="15dp"
+        android:text="2 days ago"
+        android:textColor="@color/jet"
+        android:textSize="14dip"
+        android:layout_below="@+id/kmAndTime"
+        android:layout_alignParentStart="true"
+        android:paddingBottom="10dp" />
+    <ImageView
+        android:id="@+id/clock_run"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:gravity="right"
+        android:src="@mipmap/clock_run"
+        android:layout_below="@+id/kmAndTime"
+        android:layout_toStartOf="@+id/runPaceTxt" />
+    <TextView
+        android:id="@+id/runPaceTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:fontFamily="roboto"
+        android:text="20:00"
+        android:textColor="@color/jet"
+        android:textSize="14dip"
+        android:paddingRight="15dp"
+        android:layout_alignTop="@+id/clock_run"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="21dp" />
+</RelativeLayout>
