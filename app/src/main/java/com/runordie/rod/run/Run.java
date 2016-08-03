@@ -1,14 +1,27 @@
 package com.runordie.rod.run;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
+
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by wsouza on 7/6/16.
  */
+
+//@JsonIgnoreProperties(ignoreUnknown=true)
 public class Run {
     private Integer id;
+
+    @JsonSerialize(using = RunDatetimeSerializer.class)
     private Date datetime;
     private Double distance;
     private Long duration;
@@ -17,6 +30,16 @@ public class Run {
     private Date updatedAt;
     private String pace;
     private String speed;
+
+//    private HttpEntity<ByteArrayResource> img;
+//
+//    public HttpEntity<ByteArrayResource> getImg() {
+//        return img;
+//    }
+//
+//    public void setImg(HttpEntity<ByteArrayResource> img) {
+//        this.img = img;
+//    }
 
     public String getPace() {
         return pace;
@@ -33,8 +56,6 @@ public class Run {
     public void setSpeed(String speed) {
         this.speed = speed;
     }
-
-
 
     @JsonProperty("user_id") public Integer getUserId() {
         return userId;
@@ -53,6 +74,7 @@ public class Run {
     public void setId(Integer id) {
         this.id = id;
     }
+
 
     public Date getDatetime() {
         return datetime;

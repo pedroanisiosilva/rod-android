@@ -9,14 +9,20 @@
     tools:context="com.runordie.rod.RodActivity"
     tools:showIn="@layout/activity_rod">
 
-
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/listOfRuns"
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/runSwipeContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@color/primary_dark"
-        android:padding="3dp"
-        android:dividerHeight="0.5dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent">
+
+        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/listOfRuns"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@color/primary_dark"
+            android:padding="3dp"
+            android:dividerHeight="0.5dp"
+            android:layout_weight="1" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

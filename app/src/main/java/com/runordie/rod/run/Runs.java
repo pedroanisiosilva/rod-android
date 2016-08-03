@@ -8,15 +8,9 @@ import java.util.List;
 /**
  * Created by wsouza on 7/6/16.
  */
+
 public class Runs {
 
-    public List<Run> getRuns() {
-        return runs;
-    }
-
-    public void setRuns(List<Run> runs) {
-        this.runs = runs;
-    }
 
     private List<Run> runs;
     private Integer id;
@@ -25,6 +19,22 @@ public class Runs {
     private String status;
     private String role;
     private Date createdAt;
+    private List<Stats> stats;
+
+    public List<Stats> getStats() {
+        return stats;
+    }
+
+    public void setStats(List<Stats> stats) {
+        this.stats = stats;
+    }
+    public List<Run> getRuns() {
+        return runs;
+    }
+
+    public void setRuns(List<Run> runs) {
+        this.runs = runs;
+    }
 
     public Integer getId() {
         return id;

@@ -24,22 +24,21 @@ import java.util.List;
 /**
  * Created by wsouza on 7/6/16.
  */
-public class UserRuns extends AsyncTask<String, Void, List<Run>> {
+public class UserRuns extends AsyncTask<String, Void, Runs> {
 
     private RestTemplate restTemplate;
     private Context context;
 
-    public List<Run> doInBackground(String... url) {
+    public Runs doInBackground(String... url) {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.set("X-User-Email", Login.getLoginInfo(getContext())[0]);
         requestHeaders.set("X-User-Token", Login.getLoginInfo(getContext())[1]);
         HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
         RestTemplate restTemplate = new RestTemplate();
-//        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
         ResponseEntity<Runs> runs = restTemplate.exchange(url[0], HttpMethod.GET, requestEntity, Runs.class);
 
-        return runs.getBody().getRuns();
+        return runs.getBody();
     }
 
 

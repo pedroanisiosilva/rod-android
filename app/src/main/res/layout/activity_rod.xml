@@ -45,4 +45,14 @@
         android:src="@mipmap/runner_white"
         app:backgroundTint="@color/primary_dark"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/runStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@mipmap/stats_white"
+        app:backgroundTint="@color/primary_dark"
+    />
+
 </android.support.design.widget.CoordinatorLayout>

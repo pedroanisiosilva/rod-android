@@ -2,13 +2,16 @@ package com.runordie.rod.run;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.runordie.rod.R;
@@ -18,6 +21,18 @@ import com.runordie.rod.run.fragment.DatePickerFragment;
 import com.runordie.rod.run.fragment.DurationPickerFragment;
 import com.runordie.rod.run.fragment.TimePickerFragment;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,8 +111,17 @@ public class RunEditActivity extends AppCompatActivity {
                 r.setUserId(Integer.parseInt(userId));
                 r.setDuration(DurationPickerFragment.parseDuration(duration));
                 r.setDistance(kms);
+                Bitmap bitmap = null;
+                if(viewImage().getDrawable() != null){
+                    bitmap = ((BitmapDrawable)viewImage().getDrawable()).getBitmap();
+                }
 
-                Run runCreated = new RunPost(r, this).execute(Config.getRunPostUrl(this)).get();
+                Integer statusCode = new RunPost(r, this, bitmap).execute(Config.getRunPostUrl(this)).get();
+                if(statusCode == 200){
+                    this.finish();
+                }else{
+
+                }
 
             } catch (ParseException e) {
                 e.printStackTrace();
