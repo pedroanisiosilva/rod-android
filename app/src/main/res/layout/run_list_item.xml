@@ -29,7 +29,7 @@
             android:fontFamily="roboto"
             android:paddingLeft="3dp"
             android:text=",25"
-            android:textColor="@color/jet"
+            android:textColor="@color/aluminum"
             android:textSize="14dip" />
 
         <TextView
@@ -40,7 +40,7 @@
             android:fontFamily="roboto"
             android:paddingLeft="5dp"
             android:text="km"
-            android:textColor="@color/aluminum"
+            android:textColor="@color/light_text"
             android:textSize="22dip" />
 
         <LinearLayout
@@ -67,7 +67,7 @@
         android:fontFamily="roboto"
         android:paddingLeft="15dp"
         android:text="2 days ago"
-        android:textColor="@color/jet"
+        android:textColor="@color/light_text"
         android:textSize="14dip"
         android:layout_below="@+id/kmAndTime"
         android:layout_alignParentStart="true"

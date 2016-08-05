@@ -52,9 +52,8 @@ public class RunItemListViewAdapter extends ArrayAdapter<Run>{
         String timeAgo = new PrettyTime().format(run.getDatetime());
         ((TextView)runView.findViewById(R.id.runTimeAgoTxt)).setText(timeAgo);
 
-        double speed = run.getDistance() / (run.getDuration() / 3600);
 
-        ((ImageView)runView.findViewById(R.id.runFlagImg)).setImageResource(getFlagIconName(speed));
+        ((ImageView)runView.findViewById(R.id.runFlagImg)).setImageResource(getFlagIconName(run.getSpeed()));
 
         double avgPaceSecMeters = (run.getDuration() / (run.getDistance() * 1000) * 1000);
 

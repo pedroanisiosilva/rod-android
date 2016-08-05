@@ -50,21 +50,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:background="@color/green"
+            android:background="@color/primary"
             android:layout_marginBottom="24dp"
             android:padding="12dp"
             android:text="Login"
             android:textColor="@android:color/white"/>
-
-        <TextView android:id="@+id/link_signup"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:textColor="@color/green"
-            android:text="No account yet? Create one"
-            android:gravity="center|bottom"
-            android:textSize="18dip"
-            android:textStyle="bold"/>
 
     </LinearLayout>
 </RelativeLayout>

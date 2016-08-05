@@ -34,6 +34,7 @@ public class UserRuns extends AsyncTask<String, Void, Runs> {
         requestHeaders.set("X-User-Email", Login.getLoginInfo(getContext())[0]);
         requestHeaders.set("X-User-Token", Login.getLoginInfo(getContext())[1]);
         HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<Runs> runs = restTemplate.exchange(url[0], HttpMethod.GET, requestEntity, Runs.class);

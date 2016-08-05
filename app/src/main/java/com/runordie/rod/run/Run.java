@@ -29,7 +29,8 @@ public class Run {
     private Date createdAt;
     private Date updatedAt;
     private String pace;
-    private String speed;
+    private Double speed;
+    private Integer userId;
 
 //    private HttpEntity<ByteArrayResource> img;
 //
@@ -49,11 +50,11 @@ public class Run {
         this.pace = pace;
     }
 
-    public String getSpeed() {
+    public Double getSpeed() {
         return speed;
     }
 
-    public void setSpeed(String speed) {
+    public void setSpeed(Double speed) {
         this.speed = speed;
     }
 
@@ -65,7 +66,7 @@ public class Run {
         this.userId = userId;
     }
 
-    private Integer userId;
+
 
     public Integer getId() {
         return id;

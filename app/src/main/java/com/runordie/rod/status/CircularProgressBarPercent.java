@@ -26,13 +26,13 @@ public class CircularProgressBarPercent extends CircularProgressBar {
         super(context, attrs);
         percentagePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         percentagePaint.setColor(getColor());
-        percentagePaint.setTextSize(70);
+        percentagePaint.setTextSize(100);
 
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(getColor());
-        textPaint.setTextSize(70);
-        Typeface tf = Typeface.create("", Typeface.BOLD);
-        textPaint.setTypeface(tf);
+        textPaint.setTextSize(100);
+//        Typeface tf = Typeface.create("", Typeface.BOLD);
+//        textPaint.setTypeface(tf);
     }
 
     @Override
@@ -40,7 +40,8 @@ public class CircularProgressBarPercent extends CircularProgressBar {
         super.onDraw(canvas);
 
         String percent = null;
-        if(realPercent >  100 && getProgress() == 100){
+
+        if(realPercent >  100 && getProgress() == 99.999f){
             percent = String.format("%.1f", realPercent);
         }else{
             percent = String.format("%.1f", getProgress());

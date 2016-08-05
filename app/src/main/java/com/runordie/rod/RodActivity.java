@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,7 +65,7 @@ public class RodActivity extends AppCompatActivity {
         final ListView listview = (ListView) findViewById(R.id.listOfRuns);
 
         try {
-
+            Log.i(TAG,Config.getRunsUrl(this));
             runs = new UserRuns(this).execute(Config.getRunsUrl(this)).get();
             RunItemListViewAdapter adapter = new RunItemListViewAdapter(this, R.layout.run_list_item, runs.getRuns());
 

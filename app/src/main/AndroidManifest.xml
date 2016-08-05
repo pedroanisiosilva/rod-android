@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/rodlogo"
+        android:icon="@mipmap/run_or_die_principal_logo"
         android:supportsRtl="true"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">

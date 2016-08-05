@@ -15,6 +15,7 @@ public class Stats implements Serializable {
     private Double totalKms;
     private String pace;
 
+
     public Integer getNumber() {
         return number;
     }
