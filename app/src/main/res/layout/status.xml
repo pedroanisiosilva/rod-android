@@ -126,7 +126,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="50"
-                android:id="@+id/runStatsMetaTxt"
+                android:id="@+id/runStatsMetaDescription"
                 android:textSize="40dp"
                 android:layout_gravity="center_horizontal" />
 
@@ -139,6 +139,7 @@
                 android:textSize="12dp"
                 android:layout_gravity="center_horizontal" />
         </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

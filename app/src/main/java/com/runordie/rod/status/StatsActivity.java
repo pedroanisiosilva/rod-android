@@ -116,7 +116,7 @@ public class StatsActivity extends AppCompatActivity {
         getCircularProgressBarRuns().setText(String.format("%02d", stat.getRunCount()));
         getCircularProgressBarKM().setText(stat.getTotalKms().toString());
         getCircularProgressBarPace().setText(stat.getPace());
-        getRunStatsMeta().setText(stat.getGoal());
+        getRunStatsMeta().setText(stat.getGoal().toString());
         getCircularProgressBar().setProgressWithAnimation(percent);
 
         setWeekLabel(lastWeek);
@@ -196,7 +196,7 @@ public class StatsActivity extends AppCompatActivity {
 
     public TextView getRunStatsMeta() {
         if(this.runStatsMeta == null)
-            this.runStatsMeta = (TextView) findViewById(R.id.runStatsMetaTxt);
+            this.runStatsMeta = (TextView) findViewById(R.id.runStatsMetaDescription);
         return runStatsMeta;
     }
 
