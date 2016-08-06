@@ -26,11 +26,11 @@ public class CircularProgressBarPercent extends CircularProgressBar {
         super(context, attrs);
         percentagePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         percentagePaint.setColor(getColor());
-        percentagePaint.setTextSize(100);
+        percentagePaint.setTextSize(80);
 
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(getColor());
-        textPaint.setTextSize(100);
+        textPaint.setTextSize(80);
 //        Typeface tf = Typeface.create("", Typeface.BOLD);
 //        textPaint.setTypeface(tf);
     }

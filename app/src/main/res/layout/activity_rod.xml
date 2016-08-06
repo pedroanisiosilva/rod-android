@@ -57,6 +57,6 @@
         app:backgroundTint="@color/primary_dark"
     />
 
-
+    <include layout="@layout/progress_bar" />
 
 </android.support.design.widget.CoordinatorLayout>

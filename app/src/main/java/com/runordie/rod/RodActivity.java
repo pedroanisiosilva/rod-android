@@ -1,36 +1,36 @@
 package com.runordie.rod;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.runordie.rod.helpers.Config;
 import com.runordie.rod.login.Login;
 import com.runordie.rod.login.RodLoginActivity;
 import com.runordie.rod.run.RunEditActivity;
-import com.runordie.rod.run.Run;
 import com.runordie.rod.run.RunItemListViewAdapter;
 import com.runordie.rod.run.Runs;
-import com.runordie.rod.run.UserRuns;
 import com.runordie.rod.status.StatsActivity;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
@@ -67,38 +67,16 @@ public class RodActivity extends AppCompatActivity {
     }
 
     private void updateListView(){
-        final ListView listview = (ListView) findViewById(R.id.listOfRuns);
-
-        try {
-            Log.i(TAG,Config.getRunsUrl(this));
-
-            runs = new UserRuns(this).execute(Config.getRunsUrl(this)).get();
-
-            RunItemListViewAdapter adapter = new RunItemListViewAdapter(this, R.layout.run_list_item, runs.getRuns());
-
-            listview.setAdapter(adapter);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            if(e.getCause() instanceof  HttpClientErrorException){
-                if(((HttpClientErrorException)e.getCause()).getStatusCode().value() == 401){
-                    Login.logOut(this);
-                }
-            }else{
-                e.printStackTrace();
-            }
-        }
+        Log.i(TAG,Config.getRunsUrl(this));
+        new UserRuns().execute(Config.getRunsUrl(this));
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rod);
         if(Login.isLogged(this)){
-
-
             setRunsRefresh();
-
             FloatingActionButton addRun = (FloatingActionButton) findViewById(R.id.addRun);
             addRun.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -111,9 +89,11 @@ public class RodActivity extends AppCompatActivity {
             runStats.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getBaseContext(),StatsActivity.class);
-                    intent.putExtra("stats", (Serializable) runs.getStats());
-                    startActivityForResult(intent, 0);
+                    if(getRuns() != null){
+                        Intent intent = new Intent(getBaseContext(),StatsActivity.class);
+                        intent.putExtra("stats", (Serializable) runs.getStats());
+                        startActivityForResult(intent, 0);
+                    }
                 }
             });
         }else{
@@ -145,5 +125,57 @@ public class RodActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    public class UserRuns extends AsyncTask<String, Void, Runs> {
+
+        public Runs doInBackground(String... url) {
+
+            HttpHeaders requestHeaders = new HttpHeaders();
+            requestHeaders.set("X-User-Email", Login.getLoginInfo(getBaseContext())[0]);
+            requestHeaders.set("X-User-Token", Login.getLoginInfo(getBaseContext())[1]);
+            HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+
+            RestTemplate restTemplate = new RestTemplate();
+            // tratar aqui na classe as exception, remover da atividade
+            try {
+                ResponseEntity<Runs> runs = restTemplate.exchange(url[0], HttpMethod.GET, requestEntity, Runs.class);
+                return runs.getBody();
+            }catch (HttpClientErrorException e){
+                if(e.getStatusCode().value() == 401){
+                    Login.logOut(getBaseContext());
+                    startActivity(new Intent(getBaseContext(), RodLoginActivity.class));
+                    finish();
+                    Toast.makeText(getBaseContext(), "Erro ao realizar login", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(Runs runs) {
+            super.onPostExecute(runs);
+            ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.GONE);
+            if(runs != null){
+                ListView listview = (ListView) findViewById(R.id.listOfRuns);
+                listview.setAdapter(new RunItemListViewAdapter(getBaseContext(), R.layout.run_list_item, runs.getRuns()));
+                setRuns(runs);
+            }
+        }
+    }
+
+
+    public Runs getRuns() {
+        return runs;
+    }
+
+    public void setRuns(Runs runs) {
+        this.runs = runs;
     }
 }
