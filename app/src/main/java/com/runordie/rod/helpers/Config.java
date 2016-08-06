@@ -2,10 +2,14 @@ package com.runordie.rod.helpers;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.runordie.rod.R;
 import com.runordie.rod.login.Login;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +43,15 @@ public class Config {
             properties.load(rawResource);
         }
         return properties;
+    }
+
+    @NonNull
+    public static HttpHeaders getHttpHeaders(Context context) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-User-Email", Login.getLoginInfo(context)[0]);
+        headers.set("X-User-Token", Login.getLoginInfo(context)[1]);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        return headers;
     }
     private static String getHost(Context context){
         return Config.getConfigValue(context, "rod_host");
