@@ -1,20 +1,29 @@
 package com.runordie.rod.run;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.runordie.rod.R;
+import com.runordie.rod.helpers.Config;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by wsouza on 7/21/16.
@@ -29,7 +38,7 @@ public class RunItemListViewAdapter extends ArrayAdapter<Run>{
     }
 
     @Override
-    public View getView(int position, View  view, ViewGroup parent) {
+    public View getView(final int position, View  view, ViewGroup parent) {
         LinearLayout runView;
 
         final Run run = getItem(position);
@@ -70,10 +79,63 @@ public class RunItemListViewAdapter extends ArrayAdapter<Run>{
                 Intent editRun = new Intent(getContext(),RunEditActivity.class);
                 editRun.putExtra(RunEnum.RUN_ID, run.getId());
                 editRun.putExtra(RunEnum.RUN_DISTANCE, run.getDistance());
-                editRun.putExtra(RunEnum.RUN_DURATION, run.getDuration() * 1000);
+                editRun.putExtra(RunEnum.RUN_DURATION, run.getDuration());
                 editRun.putExtra(RunEnum.RUN_DATETIME, run.getDatetime().getTime());
                 getContext().startActivity(editRun);
             }
+        });
+
+        runView.setOnLongClickListener(new View.OnLongClickListener(){
+
+            @Override
+            public boolean onLongClick(final View view) {
+                view.setBackgroundColor(view.getResources().getColor((R.color.list_item_selected)));
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dark_Dialog);
+
+                builder.setTitle("Deseja remover corrida?");
+                if(run.getNote() == null){
+                    // oque vai ser aqui? quando não existir descrição
+                }else{
+                    builder.setMessage(run.getNote());
+                }
+
+                builder.setPositiveButton("YES", new DialogInterface.OnClickListener(){
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        view.setBackgroundColor(view.getResources().getColor((R.color.white)));
+                        boolean deleted = false;
+                        try {
+                            deleted = new RunDelete(run, getContext()).execute(Config.getRunDeletetUrl(getContext(), run.getId())).get();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        dialog.dismiss();
+                        if(deleted){
+                            remove(run);
+                            Toast.makeText(getContext(), "Corrida deletada com sucesso", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(getContext(), "Erro ao deletar corrida", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                });
+
+                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        view.setBackgroundColor(view.getResources().getColor((R.color.white)));
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog alert = builder.create();
+                alert.show();
+
+                return true;
+            }
+
         });
 
         return runView;

@@ -2,6 +2,7 @@ package com.runordie.rod;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.runordie.rod.helpers.Config;
@@ -66,11 +68,12 @@ public class RodActivity extends AppCompatActivity {
 
         try {
             Log.i(TAG,Config.getRunsUrl(this));
+
             runs = new UserRuns(this).execute(Config.getRunsUrl(this)).get();
             RunItemListViewAdapter adapter = new RunItemListViewAdapter(this, R.layout.run_list_item, runs.getRuns());
 
             listview.setAdapter(adapter);
-//            AndroidSwipeLayout
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -88,9 +91,10 @@ public class RodActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if(Login.isLogged(this)){
             setContentView(R.layout.activity_rod);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_master);
+//            toolbar.setTitle(null);
 
-            setSupportActionBar(toolbar);
+//            setSupportActionBar(toolbar);
             setRunsRefresh();
 
             FloatingActionButton addRun = (FloatingActionButton) findViewById(R.id.addRun);

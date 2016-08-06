@@ -50,6 +50,10 @@ public class Config {
         return getHost(context) + uriWithUserID(context, "run_create_path");
     }
 
+    public static String getRunDeletetUrl(Context context, Integer id) {
+        return getHost(context) + Config.getConfigValue(context, "run_delete_path").replace("run_id", id.toString());
+    }
+
     public static String getRunsUrl(Context context) {
         return getHost(context) + uriWithUserID(context, "runs_path");
     }

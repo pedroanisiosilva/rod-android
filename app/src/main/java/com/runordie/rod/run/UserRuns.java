@@ -36,7 +36,7 @@ public class UserRuns extends AsyncTask<String, Void, Runs> {
         HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
 
         RestTemplate restTemplate = new RestTemplate();
-
+        // tratar aqui na classe as exception, remover da atividade
         ResponseEntity<Runs> runs = restTemplate.exchange(url[0], HttpMethod.GET, requestEntity, Runs.class);
 
         return runs.getBody();

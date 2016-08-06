@@ -68,7 +68,7 @@
     <style name="AppTheme.Dark.Dialog" parent="Theme.AppCompat.Dialog">
         <item name="colorAccent">@color/topMenu</item>
         <item name="android:textColorPrimary">@color/primary_dark</item>
-        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:background">@color/white</item>
     </style>
 
 </resources>
