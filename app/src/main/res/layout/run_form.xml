@@ -135,4 +135,5 @@
         android:layout_alignParentRight="true" />
 
     <include layout="@layout/progress_bar" />
+
 </RelativeLayout>

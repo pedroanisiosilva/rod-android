@@ -1,17 +1,13 @@
 package com.runordie.rod.run;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,7 +19,6 @@ import com.runordie.rod.helpers.Config;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by wsouza on 7/21/16.
@@ -57,7 +52,6 @@ public class RunItemListViewAdapter extends ArrayAdapter<Run>{
         final String meters = String.format("%02d", Integer.parseInt(digit));
         ((TextView)runView.findViewById(R.id.runMetersTxt)).setText("."+meters);
 
-
         String timeAgo = new PrettyTime().format(run.getDatetime());
         ((TextView)runView.findViewById(R.id.runTimeAgoTxt)).setText(timeAgo);
 
@@ -77,10 +71,7 @@ public class RunItemListViewAdapter extends ArrayAdapter<Run>{
             @Override
             public void onClick(View view) {
                 Intent editRun = new Intent(getContext(),RunEditActivity.class);
-                editRun.putExtra(RunEnum.RUN_ID, run.getId());
-                editRun.putExtra(RunEnum.RUN_DISTANCE, run.getDistance());
-                editRun.putExtra(RunEnum.RUN_DURATION, run.getDuration());
-                editRun.putExtra(RunEnum.RUN_DATETIME, run.getDatetime().getTime());
+                editRun.putExtra(RunEnum.RUN, run);
                 getContext().startActivity(editRun);
             }
         });
@@ -106,7 +97,7 @@ public class RunItemListViewAdapter extends ArrayAdapter<Run>{
                         view.setBackgroundColor(view.getResources().getColor((R.color.white)));
                         boolean deleted = false;
                         try {
-                            deleted = new RunDelete(run, getContext()).execute(Config.getRunDeletetUrl(getContext(), run.getId())).get();
+                            deleted = new RunDelete(run, getContext()).execute(Config.getRunDUUrl(getContext(), run.getId())).get();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

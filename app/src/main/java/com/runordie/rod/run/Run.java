@@ -10,6 +10,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
  */
 
 //@JsonIgnoreProperties(ignoreUnknown=true)
-public class Run {
+public class Run implements Serializable {
     private Integer id;
 
     @JsonSerialize(using = RunDatetimeSerializer.class)

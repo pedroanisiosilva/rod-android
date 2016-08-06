@@ -47,6 +47,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
@@ -61,6 +62,7 @@ public class RunEditActivity extends AppCompatActivity {
     private EditText durationRun;
     private EditText descriptionRun;
     private ImageView photo;
+    private Run run = new Run();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,16 +73,15 @@ public class RunEditActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
 
-
         if(extras != null){
-            Integer runId = extras.getInt(RunEnum.RUN_ID, 0);
-            if(runId > 0){
-                Long runDateTime = extras.getLong(RunEnum.RUN_DATETIME, 0);
-                Double runDistance = extras.getDouble(RunEnum.RUN_DISTANCE, 0);
-                Long runDuration= extras.getLong(RunEnum.RUN_DURATION, 0);
-                kmsOfRun().setText(runDistance.toString());
-                durationOfRun().setText(DurationPickerFragment.parseDateToHours(runDuration.longValue()));
-
+            Run runToUpdate = (Run) extras.get(RunEnum.RUN);
+            if(runToUpdate != null){
+                kmsOfRun().setText(runToUpdate.getDistance().toString());
+                descriptionOfRun().setText(runToUpdate.getNote());
+                durationOfRun().setText(DurationPickerFragment.parseDateToHours(runToUpdate.getDuration() * 1000));
+                dateOfRun().setText(new SimpleDateFormat("dd/MM/yyyy").format(runToUpdate.getDatetime()));
+                timeOfRun().setText(new SimpleDateFormat("hh:mm").format(runToUpdate.getDatetime()));
+                run.setId(runToUpdate.getId());
             }
         }
 
@@ -105,8 +106,12 @@ public class RunEditActivity extends AppCompatActivity {
         if(new Validation().isValid()){
             try {
                 BuildRun buildRun = new BuildRun().build();
-                AsyncTask<String, Void, Integer> result = new RunPost(buildRun).execute(Config.getRunPostUrl(this));
-            } catch (ParseException e) {
+                if(run.getId() != null){
+                    new RunPost(buildRun).execute(Config.getRunDUUrl(this, run.getId()));
+                }else{
+                    new RunPost(buildRun).execute(Config.getRunPostUrl(this));
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -172,18 +177,14 @@ public class RunEditActivity extends AppCompatActivity {
     }
 
     private class BuildRun {
-        private Run run;
         private Bitmap bitmap = null;
-
-        public Run getRun() {
-            return run;
-        }
 
         public Bitmap getBitmap() {
             return bitmap;
         }
 
         public BuildRun build() throws ParseException {
+
             String description = descriptionOfRun().getText().toString();
             TextView kmsText = (TextView)findViewById(R.id.kmsRun);
             Double kms = Double.parseDouble(kmsText.getText().toString());
@@ -196,11 +197,11 @@ public class RunEditActivity extends AppCompatActivity {
 
             long parsedDuration = DurationPickerFragment.parseDuration(duration);
             String userId = Login.getLoginInfo(getBaseContext())[2];
-            run = new Run();
             run.setDatetime(data);
             run.setUserId(Integer.parseInt(userId));
             run.setDuration(DurationPickerFragment.parseDuration(duration));
             run.setDistance(kms);
+            run.setNote(descriptionOfRun().getText().toString());
             if(viewImage().getDrawable() != null){
                 bitmap = ((BitmapDrawable)viewImage().getDrawable()).getBitmap();
             }
@@ -284,6 +285,7 @@ public class RunEditActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
                 Resource resourceImg = new FileSystemResource(f);
                 HttpHeaders pictureHeader = new HttpHeaders();
                 pictureHeader.setContentType(MediaType.IMAGE_JPEG);
@@ -291,10 +293,10 @@ public class RunEditActivity extends AppCompatActivity {
                 multipartRequest.add("rod_images_attributes[0][image]", picturePart);
             }
 
-            multipartRequest.add("datetime", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(buildRun.getRun().getDatetime()));
-            multipartRequest.add("distance", buildRun.getRun().getDistance());
-            multipartRequest.add("duration", buildRun.getRun().getDuration() / 1000);
-            multipartRequest.add("note", buildRun.getRun().getNote());
+            multipartRequest.add("datetime", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(run.getDatetime()));
+            multipartRequest.add("distance", run.getDistance());
+            multipartRequest.add("duration", run.getDuration() / 1000);
+            multipartRequest.add("note", run.getNote());
 
             HttpMessageConverter<Object> jackson = new MappingJackson2HttpMessageConverter();
             HttpMessageConverter<Resource> resource = new ResourceHttpMessageConverter();
@@ -307,12 +309,15 @@ public class RunEditActivity extends AppCompatActivity {
             RestTemplate restTemplate = new RestTemplate(Arrays.asList(jackson, resource, formHttpMessageConverter));
             int code = 0;
 
-            try{
-                ResponseEntity<Object> result = restTemplate.exchange(urls[0], HttpMethod.POST, requestEntity, Object.class);
-                code = result.getStatusCode().value();
-            }catch (Exception e){
-                e.printStackTrace();
+            ResponseEntity<Object> result;
+
+            if(run.getId() != null){
+                result = restTemplate.exchange(urls[0], HttpMethod.PUT, requestEntity, Object.class);
+            }else{
+                result = restTemplate.exchange(urls[0], HttpMethod.POST, requestEntity, Object.class);
             }
+
+            code = result.getStatusCode().value();
 
             if(f != null){
                 f.delete();
@@ -360,4 +365,5 @@ public class RunEditActivity extends AppCompatActivity {
             timePicker = (EditText) findViewById(R.id.timeOfRun);
         return timePicker;
     }
+
 }
