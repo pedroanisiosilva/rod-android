@@ -3,6 +3,7 @@ package com.runordie.rod.run;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -43,6 +45,10 @@ import org.springframework.web.client.RestTemplate;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -81,6 +87,9 @@ public class RunEditActivity extends AppCompatActivity {
                 durationOfRun().setText(DurationPickerFragment.parseDateToHours(runToUpdate.getDuration() * 1000));
                 dateOfRun().setText(new SimpleDateFormat("dd/MM/yyyy").format(runToUpdate.getDatetime()));
                 timeOfRun().setText(new SimpleDateFormat("hh:mm").format(runToUpdate.getDatetime()));
+                if(runToUpdate.getImagePath() != null){
+                    new DownloadImageTask().execute(Config.getHost(getBaseContext()) + runToUpdate.getImagePath());
+                }
                 run.setId(runToUpdate.getId());
             }
         }
@@ -273,7 +282,7 @@ public class RunEditActivity extends AppCompatActivity {
             MultiValueMap<String, Object> multipartRequest = new LinkedMultiValueMap<>();
             File f = null;
             if(buildRun.getBitmap() != null){
-                f = new File(getBaseContext().getCacheDir(), "aaa1.jpg");
+                f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + "");
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 20, bos);
@@ -329,7 +338,24 @@ public class RunEditActivity extends AppCompatActivity {
 
     }
 
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
+        protected Bitmap doInBackground(String... urls) {
+            Bitmap runImage = null;
+            try {
+                InputStream in = new java.net.URL(urls[0]).openStream();
+                runImage = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return runImage;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            viewImage().setImageBitmap(result);
+        }
+    }
     private EditText kmsOfRun(){
         if(kmsRun == null)
             kmsRun = (EditText) findViewById(R.id.kmsRun);

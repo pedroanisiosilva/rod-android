@@ -53,7 +53,7 @@ public class Config {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         return headers;
     }
-    private static String getHost(Context context){
+    public static String getHost(Context context){
         return Config.getConfigValue(context, "rod_host");
     }
     private static String uriWithUserID(Context context, String key){

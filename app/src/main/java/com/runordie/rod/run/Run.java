@@ -32,6 +32,7 @@ public class Run implements Serializable {
     private String pace;
     private Double speed;
     private Integer userId;
+    private String imagePath;
 
 //    private HttpEntity<ByteArrayResource> img;
 //
@@ -125,4 +126,11 @@ public class Run implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    @JsonProperty("image_path") public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 }
