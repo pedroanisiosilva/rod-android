@@ -6,13 +6,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.runordie.rod.R;
 import com.runordie.rod.helpers.Config;
@@ -21,25 +19,10 @@ import com.runordie.rod.run.fragment.DatePickerFragment;
 import com.runordie.rod.run.fragment.DurationPickerFragment;
 import com.runordie.rod.run.fragment.TimePickerFragment;
 
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -92,32 +75,13 @@ public class RunEditActivity extends AppCompatActivity {
             }
         }
     }
+
     private void doCreateRun() {
-        if(new RunValidation(descriptionOfRun(), durationOfRun(),kmsOfRun(),dateOfRun(),timeOfRun()).isValid()){
+        if(new Validation().isValid()){
 
             try {
-                String description = descriptionOfRun().getText().toString();
-                Double kms = Double.parseDouble(kmsOfRun().getText().toString());
-                String duration = durationOfRun().getText().toString();
-                String date = dateOfRun().getText().toString();
-                String time = timeOfRun().getText().toString();
-                DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-
-                Date data = format.parse(date + " " + time);
-
-                long parsedDuration = DurationPickerFragment.parseDuration(duration);
-                String userId = Login.getLoginInfo(this)[2];
-                Run r = new Run();
-                r.setDatetime(data);
-                r.setUserId(Integer.parseInt(userId));
-                r.setDuration(DurationPickerFragment.parseDuration(duration));
-                r.setDistance(kms);
-                Bitmap bitmap = null;
-                if(viewImage().getDrawable() != null){
-                    bitmap = ((BitmapDrawable)viewImage().getDrawable()).getBitmap();
-                }
-
-                Integer statusCode = new RunPost(r, this, bitmap).execute(Config.getRunPostUrl(this)).get();
+                BuildRun buildRun = new BuildRun().build();
+                Integer statusCode = new RunPost(buildRun.getRun(), this, buildRun.getBitmap()).execute(Config.getRunPostUrl(this)).get();
                 if(statusCode == 200){
                     this.finish();
                 }else{
@@ -147,52 +111,9 @@ public class RunEditActivity extends AppCompatActivity {
         startActivityForResult(intent, 1);
     }
 
-    private FloatingActionButton btnAddRun(){
-        if(btnAddRun == null)
-            btnAddRun = (FloatingActionButton) findViewById(R.id.btnAddRun);
-
-        return btnAddRun;
-    }
-
-    private EditText kmsOfRun(){
-        if(kmsRun == null)
-            kmsRun = (EditText) findViewById(R.id.kmsRun);
-        return kmsRun;
-    }
-
-    private EditText durationOfRun(){
-        if(durationRun == null)
-            durationRun = (EditText) findViewById(R.id.durationRun);
-        return durationRun;
-    }
-
-    private EditText descriptionOfRun(){
-        if(descriptionRun == null)
-            descriptionRun = (EditText) findViewById(R.id.descriptionRun);
-        return descriptionRun;
-    }
-
-    private EditText dateOfRun(){
-        if(datePicker == null)
-            datePicker = (EditText) findViewById(R.id.dateOfRun);
-        return datePicker;
-    }
-
-    private ImageView viewImage() {
-        if(photo == null)
-            photo = (ImageView) findViewById(R.id.runPhoto);
-        return photo;
-    }
-
-    private EditText timeOfRun(){
-        if(timePicker == null)
-            timePicker = (EditText) findViewById(R.id.timeOfRun);
-        return timePicker;
-    }
-
     private void setOnClicks(){
 
-        btnAddRun().setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btnAddRun).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 doCreateRun();
@@ -236,4 +157,109 @@ public class RunEditActivity extends AppCompatActivity {
 
     }
 
+    private class BuildRun {
+        private Run run;
+        private Bitmap bitmap = null;
+
+        public Run getRun() {
+            return run;
+        }
+
+        public Bitmap getBitmap() {
+            return bitmap;
+        }
+
+        public BuildRun build() throws ParseException {
+            String description = descriptionOfRun().getText().toString();
+            TextView kmsText = (TextView)findViewById(R.id.kmsRun);
+            Double kms = Double.parseDouble(kmsText.getText().toString());
+            String duration = durationOfRun().getText().toString();
+            String date = dateOfRun().getText().toString();
+            String time = timeOfRun().getText().toString();
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+            Date data = format.parse(date + " " + time);
+
+            long parsedDuration = DurationPickerFragment.parseDuration(duration);
+            String userId = Login.getLoginInfo(getBaseContext())[2];
+            run = new Run();
+            run.setDatetime(data);
+            run.setUserId(Integer.parseInt(userId));
+            run.setDuration(DurationPickerFragment.parseDuration(duration));
+            run.setDistance(kms);
+            if(viewImage().getDrawable() != null){
+                bitmap = ((BitmapDrawable)viewImage().getDrawable()).getBitmap();
+            }
+            return this;
+        }
+    }
+
+    public class Validation {
+
+        public boolean isValid(){
+            boolean valid = true;
+
+            if(descriptionOfRun().getText().toString().trim().isEmpty()){
+                descriptionOfRun().setError("Description is required!!!");
+                valid = false;
+            }
+
+            if(kmsOfRun().getText().toString().trim().isEmpty() || kmsOfRun().getText().toString().trim().matches("")){
+                kmsOfRun().setError("Km`s is required!!!");
+                valid = false;
+            }
+
+            if(durationOfRun().getText().toString().trim().isEmpty()){
+                durationOfRun().setError("Duration is required!!!");
+                valid = false;
+            }
+
+            if(dateOfRun().getText().toString().trim().isEmpty()){
+                dateOfRun().setError("Date is required!!!");
+                valid = false;
+            }
+            if(timeOfRun().getText().toString().trim().isEmpty()){
+                timeOfRun().setError("Time is required!!!");
+                valid = false;
+            }
+
+            return valid;
+        }
+    }
+
+    private EditText kmsOfRun(){
+        if(kmsRun == null)
+            kmsRun = (EditText) findViewById(R.id.kmsRun);
+        return kmsRun;
+    }
+
+    private EditText durationOfRun(){
+        if(durationRun == null)
+            durationRun = (EditText) findViewById(R.id.durationRun);
+        return durationRun;
+    }
+
+    private EditText descriptionOfRun(){
+        if(descriptionRun == null)
+            descriptionRun = (EditText) findViewById(R.id.descriptionRun);
+        return descriptionRun;
+    }
+
+    private EditText dateOfRun(){
+        if(datePicker == null)
+            datePicker = (EditText) findViewById(R.id.dateOfRun);
+        return datePicker;
+    }
+
+    private ImageView viewImage() {
+        if(photo == null)
+            photo = (ImageView) findViewById(R.id.runPhoto);
+        return photo;
+    }
+
+    private EditText timeOfRun(){
+        if(timePicker == null)
+            timePicker = (EditText) findViewById(R.id.timeOfRun);
+        return timePicker;
+    }
 }

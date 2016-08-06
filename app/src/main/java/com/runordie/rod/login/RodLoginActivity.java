@@ -60,7 +60,7 @@ public class RodLoginActivity extends AppCompatActivity {
 
             try {
                 RelativeLayout loading = (RelativeLayout) findViewById(R.id.loadingPanel);
-                LoginResult loginResult = new RodAuth(loading, emailField().getText().toString(), pwdField().getText().toString()).execute(url).get();
+                LoginResult loginResult = new RodAuth(emailField().getText().toString(), pwdField().getText().toString()).execute(url).get();
 
                 if(!loginResult.getSuccess()){
                     onLoginFailed();
