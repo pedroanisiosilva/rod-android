@@ -67,7 +67,6 @@ public class RodActivity extends AppCompatActivity {
     }
 
     private void updateListView(){
-        swipeContainer.setRefreshing(true);
         final ListView listview = (ListView) findViewById(R.id.listOfRuns);
 
         try {
@@ -90,7 +89,6 @@ public class RodActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        swipeContainer.setRefreshing(false);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
