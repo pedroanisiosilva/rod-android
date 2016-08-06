@@ -67,7 +67,7 @@ public class RodActivity extends AppCompatActivity {
 
     private void updateListView(boolean showLoading){
         Log.i(TAG,Config.getRunsUrl(this));
-        new UserRuns(showLoading).execute(Config.getRunsUrl(this));
+        new UserRuns(showLoading, this).execute(Config.getRunsUrl(this));
     }
 
     @Override
@@ -126,11 +126,13 @@ public class RodActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     public class UserRuns extends AsyncTask<String, Void, Runs> {
-        public Boolean showLoading = true;
+        private Boolean showLoading = true;
+        private Context context;
 
         public UserRuns(){}
-        public UserRuns(Boolean showLoading){
+        public UserRuns(Boolean showLoading, Context context){
             this.showLoading = showLoading;
+            this.context = context;
         }
 
         public Runs doInBackground(String... url) {
@@ -171,7 +173,7 @@ public class RodActivity extends AppCompatActivity {
                 ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.GONE);
             if(runs != null){
                 ListView listview = (ListView) findViewById(R.id.listOfRuns);
-                listview.setAdapter(new RunItemListViewAdapter(getBaseContext(), R.layout.run_list_item, runs.getRuns()));
+                listview.setAdapter(new RunItemListViewAdapter(context, R.layout.run_list_item, runs.getRuns()));
                 setRuns(runs);
             }
         }
