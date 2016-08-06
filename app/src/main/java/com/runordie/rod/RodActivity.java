@@ -30,6 +30,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+//hockeyapp
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.metrics.MetricsManager;
+
 import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
 
@@ -44,6 +48,7 @@ public class RodActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();  // Always call the superclass method first
         updateListView(true);
+        checkForCrashes();
 
     }
 
@@ -73,6 +78,9 @@ public class RodActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MetricsManager.register(this, getApplication());
+
         setContentView(R.layout.activity_rod);
         if(Login.isLogged(this)){
             setRunsRefresh();
@@ -186,5 +194,9 @@ public class RodActivity extends AppCompatActivity {
 
     public void setRuns(Runs runs) {
         this.runs = runs;
+    }
+
+    private void checkForCrashes() {
+        CrashManager.register(this);
     }
 }

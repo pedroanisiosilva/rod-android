@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -82,11 +83,22 @@ public class RunEditActivity extends AppCompatActivity {
         if(extras != null){
             Run runToUpdate = (Run) extras.get(RunEnum.RUN);
             if(runToUpdate != null){
+                Calendar cal = Calendar.getInstance();
+                TimeZone tz = cal.getTimeZone();
+
+
                 kmsOfRun().setText(runToUpdate.getDistance().toString());
                 descriptionOfRun().setText(runToUpdate.getNote());
                 durationOfRun().setText(DurationPickerFragment.parseDateToHours(runToUpdate.getDuration() * 1000));
-                dateOfRun().setText(new SimpleDateFormat("dd/MM/yyyy").format(runToUpdate.getDatetime()));
-                timeOfRun().setText(new SimpleDateFormat("hh:mm").format(runToUpdate.getDatetime()));
+
+                SimpleDateFormat sdf0 = new SimpleDateFormat("dd/MM/yyyy");
+                sdf0.setTimeZone(tz);
+                dateOfRun().setText(sdf0.format(runToUpdate.getDatetime()));
+
+                SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm");
+                sdf1.setTimeZone(tz);
+                timeOfRun().setText(sdf1.format(runToUpdate.getDatetime()));
+
                 if(runToUpdate.getImagePath() != null){
                     new DownloadImageTask().execute(Config.getHost(getBaseContext()) + runToUpdate.getImagePath());
                 }
