@@ -43,8 +43,7 @@ public class RodActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
-
-        updateListView();
+        updateListView(true);
 
     }
 
@@ -55,7 +54,7 @@ public class RodActivity extends AppCompatActivity {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                updateListView();
+                updateListView(false);
                 swipeContainer.setRefreshing(false);
             }
         });
@@ -66,9 +65,9 @@ public class RodActivity extends AppCompatActivity {
 
     }
 
-    private void updateListView(){
+    private void updateListView(boolean showLoading){
         Log.i(TAG,Config.getRunsUrl(this));
-        new UserRuns().execute(Config.getRunsUrl(this));
+        new UserRuns(showLoading).execute(Config.getRunsUrl(this));
     }
 
     @Override
@@ -127,6 +126,12 @@ public class RodActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     public class UserRuns extends AsyncTask<String, Void, Runs> {
+        public Boolean showLoading = true;
+
+        public UserRuns(){}
+        public UserRuns(Boolean showLoading){
+            this.showLoading = showLoading;
+        }
 
         public Runs doInBackground(String... url) {
 
@@ -155,13 +160,15 @@ public class RodActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.VISIBLE);
+            if(showLoading)
+                ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(Runs runs) {
             super.onPostExecute(runs);
-            ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.GONE);
+            if(showLoading)
+                ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.GONE);
             if(runs != null){
                 ListView listview = (ListView) findViewById(R.id.listOfRuns);
                 listview.setAdapter(new RunItemListViewAdapter(getBaseContext(), R.layout.run_list_item, runs.getRuns()));
