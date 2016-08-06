@@ -2,6 +2,7 @@ package com.runordie.rod.login;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.RelativeLayout;
 
 import org.springframework.http.HttpBasicAuthentication;
 import org.springframework.http.HttpEntity;
@@ -30,10 +31,12 @@ public class RodAuth extends AsyncTask<String, Void, LoginResult> {
 
     private String email;
     private String pwd;
+    private RelativeLayout loading;
 
-    public RodAuth(String email, String pwd){
+    public RodAuth(RelativeLayout loading, String email, String pwd){
         this.email = email;
         this.pwd = pwd;
+        this.loading = loading;
     }
     protected LoginResult doInBackground(String... url) {
         RestTemplate restTemplate = new RestTemplate();

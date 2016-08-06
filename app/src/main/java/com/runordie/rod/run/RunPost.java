@@ -81,7 +81,7 @@ public class RunPost extends AsyncTask<String, Void, Integer> {
 
         multipartRequest.add("datetime", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(run.getDatetime()));
         multipartRequest.add("distance", run.getDistance());
-        multipartRequest.add("duration", run.getDuration() / 1000 / 60);
+        multipartRequest.add("duration", run.getDuration() / 1000);
         multipartRequest.add("note", run.getNote());
 
         HttpMessageConverter<Object> jackson = new MappingJackson2HttpMessageConverter();

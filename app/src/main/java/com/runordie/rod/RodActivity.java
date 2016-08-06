@@ -1,5 +1,6 @@
 package com.runordie.rod;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -13,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.runordie.rod.helpers.Config;
 import com.runordie.rod.login.Login;
@@ -40,6 +43,7 @@ public class RodActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
+
         updateListView();
 
     }
@@ -47,6 +51,7 @@ public class RodActivity extends AppCompatActivity {
     private void setRunsRefresh(){
         swipeContainer = (SwipeRefreshLayout) findViewById(R.id.runSwipeContainer);
         // Setup refresh listener which triggers new data loading
+
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -59,17 +64,17 @@ public class RodActivity extends AppCompatActivity {
                                                 android.R.color.holo_orange_light,
                                                 android.R.color.holo_red_light);
 
-
     }
 
     private void updateListView(){
-
+        swipeContainer.setRefreshing(true);
         final ListView listview = (ListView) findViewById(R.id.listOfRuns);
 
         try {
             Log.i(TAG,Config.getRunsUrl(this));
 
             runs = new UserRuns(this).execute(Config.getRunsUrl(this)).get();
+
             RunItemListViewAdapter adapter = new RunItemListViewAdapter(this, R.layout.run_list_item, runs.getRuns());
 
             listview.setAdapter(adapter);
@@ -85,16 +90,15 @@ public class RodActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+        swipeContainer.setRefreshing(false);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_rod);
         if(Login.isLogged(this)){
-            setContentView(R.layout.activity_rod);
-//            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_master);
-//            toolbar.setTitle(null);
 
-//            setSupportActionBar(toolbar);
+
             setRunsRefresh();
 
             FloatingActionButton addRun = (FloatingActionButton) findViewById(R.id.addRun);

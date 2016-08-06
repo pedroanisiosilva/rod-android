@@ -69,7 +69,7 @@ public class RunEditActivity extends AppCompatActivity {
             if(runId > 0){
                 Long runDateTime = extras.getLong(RunEnum.RUN_DATETIME, 0);
                 Double runDistance = extras.getDouble(RunEnum.RUN_DISTANCE, 0);
-                Double runDuration= extras.getDouble(RunEnum.RUN_DURATION, 0);
+                Long runDuration= extras.getLong(RunEnum.RUN_DURATION, 0);
                 kmsOfRun().setText(runDistance.toString());
                 durationOfRun().setText(DurationPickerFragment.parseDateToHours(runDuration.longValue()));
 
@@ -94,6 +94,7 @@ public class RunEditActivity extends AppCompatActivity {
     }
     private void doCreateRun() {
         if(new RunValidation(descriptionOfRun(), durationOfRun(),kmsOfRun(),dateOfRun(),timeOfRun()).isValid()){
+
             try {
                 String description = descriptionOfRun().getText().toString();
                 Double kms = Double.parseDouble(kmsOfRun().getText().toString());
@@ -122,7 +123,6 @@ public class RunEditActivity extends AppCompatActivity {
                 }else{
 
                 }
-
             } catch (ParseException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {

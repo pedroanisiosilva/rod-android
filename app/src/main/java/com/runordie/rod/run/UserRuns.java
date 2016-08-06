@@ -3,6 +3,9 @@ package com.runordie.rod.run;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.runordie.rod.helpers.Config;
 import com.runordie.rod.login.Login;
@@ -30,6 +33,7 @@ public class UserRuns extends AsyncTask<String, Void, Runs> {
     private Context context;
 
     public Runs doInBackground(String... url) {
+
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.set("X-User-Email", Login.getLoginInfo(getContext())[0]);
         requestHeaders.set("X-User-Token", Login.getLoginInfo(getContext())[1]);
@@ -41,7 +45,6 @@ public class UserRuns extends AsyncTask<String, Void, Runs> {
 
         return runs.getBody();
     }
-
 
     public UserRuns(Context context) {
         this.context = context;

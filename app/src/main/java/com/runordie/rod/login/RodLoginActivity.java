@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,16 +55,12 @@ public class RodLoginActivity extends AppCompatActivity {
     }
     public void doLogin() {
         if(Login.isValidParams(emailField(),  pwdField())){
-            final ProgressDialog progressDialog = new ProgressDialog(this,
-                    R.style.AppTheme_Dark_Dialog);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Authenticating...");
-            progressDialog.show();
             loginButton().setEnabled(false);
             String url = Config.getConfigValue(this, "rod_host") + Config.getConfigValue(this, "rod_session");
 
             try {
-                LoginResult loginResult = new RodAuth(emailField().getText().toString(), pwdField().getText().toString()).execute(url).get();
+                RelativeLayout loading = (RelativeLayout) findViewById(R.id.loadingPanel);
+                LoginResult loginResult = new RodAuth(loading, emailField().getText().toString(), pwdField().getText().toString()).execute(url).get();
 
                 if(!loginResult.getSuccess()){
                     onLoginFailed();
@@ -79,7 +76,7 @@ public class RodLoginActivity extends AppCompatActivity {
             }
 
             loginButton().setEnabled(true);
-            progressDialog.dismiss();
+
         }
     }
     @Override
