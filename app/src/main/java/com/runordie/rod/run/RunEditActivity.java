@@ -294,10 +294,10 @@ public class RunEditActivity extends AppCompatActivity {
             MultiValueMap<String, Object> multipartRequest = new LinkedMultiValueMap<>();
             File f = null;
             if(buildRun.getBitmap() != null){
-                f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + "");
+                f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + ".jpg");
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 20, bos);
+                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 50, bos);
                     byte[] bitmapdata = bos.toByteArray();
                     FileOutputStream fos = new FileOutputStream(f);
                     fos.write(bitmapdata);
@@ -314,7 +314,10 @@ public class RunEditActivity extends AppCompatActivity {
                 multipartRequest.add("rod_images_attributes[0][image]", picturePart);
             }
 
-            multipartRequest.add("datetime", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(run.getDatetime()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            multipartRequest.add("datetime", sdf.format(run.getDatetime()));
             multipartRequest.add("distance", run.getDistance());
             multipartRequest.add("duration", run.getDuration() / 1000);
             multipartRequest.add("note", run.getNote());
