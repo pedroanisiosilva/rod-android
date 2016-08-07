@@ -297,7 +297,7 @@ public class RunEditActivity extends AppCompatActivity {
                 f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + ".jpg");
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 70, bos);
                     byte[] bitmapdata = bos.toByteArray();
                     FileOutputStream fos = new FileOutputStream(f);
                     fos.write(bitmapdata);
