@@ -8,6 +8,8 @@
     tools:context="com.runordie.rod.RodActivity"
     tools:showIn="@layout/content_rod">
 
+    <include layout="@layout/progress_bar" />
+
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="140dp"
@@ -17,11 +19,9 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
-            android:title=" "
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:background="@color/white"
-
             app:popupTheme="@style/AppTheme.PopupOverlay" >
 
             <ImageView
@@ -57,6 +57,6 @@
         app:backgroundTint="@color/primary_dark"
     />
 
-    <include layout="@layout/progress_bar" />
+
 
 </android.support.design.widget.CoordinatorLayout>

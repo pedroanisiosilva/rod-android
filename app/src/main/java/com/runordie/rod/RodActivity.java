@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -39,7 +40,6 @@ import java.util.concurrent.ExecutionException;
 
 
 public class RodActivity extends AppCompatActivity {
-    private RunEditActivity newRun = new RunEditActivity();
     private String TAG = "RodActivity";
     private SwipeRefreshLayout swipeContainer;
     private Runs runs = null;
@@ -47,9 +47,7 @@ public class RodActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
-        updateListView(true);
-        checkForCrashes();
-
+        updateRuns(true);
     }
 
     private void setRunsRefresh(){
@@ -59,54 +57,61 @@ public class RodActivity extends AppCompatActivity {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                updateListView(false);
+                updateRuns(false);
                 swipeContainer.setRefreshing(false);
             }
         });
 
-        swipeContainer.setColorSchemeResources(R.color.primary, android.R.color.holo_green_light,
-                                                android.R.color.holo_orange_light,
-                                                android.R.color.holo_red_light);
+//        swipeContainer.setColorSchemeResources(R.color.primary, android.R.color.holo_green_light,
+//                                                android.R.color.holo_orange_light,
+//                                                android.R.color.holo_red_light);
 
     }
-
-    private void updateListView(boolean showLoading){
-        Log.i(TAG,Config.getRunsUrl(this));
+    private void updateRuns(boolean showLoading){
         new UserRuns(showLoading, this).execute(Config.getRunsUrl(this));
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MetricsManager.register(this, getApplication());
-
+        registerAppManger();
         setContentView(R.layout.activity_rod);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setTitle(" ");
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+
         if(Login.isLogged(this)){
             setRunsRefresh();
-            FloatingActionButton addRun = (FloatingActionButton) findViewById(R.id.addRun);
-            addRun.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    startActivityForResult(new Intent(getBaseContext(),RunEditActivity.class), 0);
-                }
-            });
-
-            FloatingActionButton runStats = (FloatingActionButton) findViewById(R.id.runStats);
-            runStats.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(getRuns() != null){
-                        Intent intent = new Intent(getBaseContext(),StatsActivity.class);
-                        intent.putExtra("stats", (Serializable) runs.getStats());
-                        startActivityForResult(intent, 0);
-                    }
-                }
-            });
+            setOnClickActions();
         }else{
             startActivity(new Intent(this,RodLoginActivity.class));
             this.finish();
         }
+    }
+
+    private void setOnClickActions() {
+
+        FloatingActionButton addRun = (FloatingActionButton) findViewById(R.id.addRun);
+
+        addRun.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(new Intent(getBaseContext(),RunEditActivity.class), 0);
+            }
+        });
+
+        FloatingActionButton runStats = (FloatingActionButton) findViewById(R.id.runStats);
+
+        runStats.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(getRuns() != null){
+                    Intent intent = new Intent(getBaseContext(),StatsActivity.class);
+                    intent.putExtra("stats", (Serializable) runs.getStats());
+                    startActivityForResult(intent, 0);
+                }
+            }
+        });
     }
 
     @Override
@@ -118,26 +123,25 @@ public class RodActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
             Login.logOut(this);
             startActivity(new Intent(this, RodLoginActivity.class));
             this.finish();
             return true;
         }
+//        if (id == R.id.user_setting) {
+//            startActivity(new Intent(this, UserActivity.class));
+//            return false;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
+
     public class UserRuns extends AsyncTask<String, Void, Runs> {
         private Boolean showLoading = true;
         private Context context;
 
-        public UserRuns(){}
         public UserRuns(Boolean showLoading, Context context){
             this.showLoading = showLoading;
             this.context = context;
@@ -145,25 +149,20 @@ public class RodActivity extends AppCompatActivity {
 
         public Runs doInBackground(String... url) {
 
-            HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.set("X-User-Email", Login.getLoginInfo(getBaseContext())[0]);
-            requestHeaders.set("X-User-Token", Login.getLoginInfo(getBaseContext())[1]);
-            HttpEntity<?> requestEntity = new HttpEntity<Object>(requestHeaders);
+            HttpEntity<?> requestEntity = new HttpEntity<Object>(Config.getHttpHeaders(context));
 
-            RestTemplate restTemplate = new RestTemplate();
             // tratar aqui na classe as exception, remover da atividade
             try {
-                ResponseEntity<Runs> runs = restTemplate.exchange(url[0], HttpMethod.GET, requestEntity, Runs.class);
+                ResponseEntity<Runs> runs = new RestTemplate().exchange(url[0], HttpMethod.GET, requestEntity, Runs.class);
+
                 return runs.getBody();
             }catch (HttpClientErrorException e){
                 if(e.getStatusCode().value() == 401){
                     Login.logOut(getBaseContext());
                     startActivity(new Intent(getBaseContext(), RodLoginActivity.class));
                     finish();
-                    Toast.makeText(getBaseContext(), "Erro ao realizar login", Toast.LENGTH_LONG).show();
                 }
             }
-
             return null;
         }
 
@@ -179,6 +178,7 @@ public class RodActivity extends AppCompatActivity {
             super.onPostExecute(runs);
             if(showLoading)
                 ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.GONE);
+
             if(runs != null){
                 ListView listview = (ListView) findViewById(R.id.listOfRuns);
                 listview.setAdapter(new RunItemListViewAdapter(context, R.layout.run_list_item, runs.getRuns()));
@@ -196,7 +196,8 @@ public class RodActivity extends AppCompatActivity {
         this.runs = runs;
     }
 
-    private void checkForCrashes() {
+    private void registerAppManger() {
+        MetricsManager.register(this, getApplication());
         CrashManager.register(this);
     }
 }

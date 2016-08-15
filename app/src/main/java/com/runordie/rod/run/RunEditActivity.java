@@ -13,7 +13,10 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,6 +25,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SquaringDrawable;
 import com.runordie.rod.R;
 import com.runordie.rod.helpers.Config;
 import com.runordie.rod.login.Login;
@@ -42,6 +47,7 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -66,7 +72,7 @@ import java.util.concurrent.ExecutionException;
  * Created by wsouza on 7/9/16.
  */
 public class RunEditActivity extends AppCompatActivity {
-    private FloatingActionButton btnAddRun;
+
     private EditText datePicker;
     private EditText timePicker;
     private EditText kmsRun;
@@ -104,7 +110,10 @@ public class RunEditActivity extends AppCompatActivity {
                 timeOfRun().setText(sdf1.format(runToUpdate.getDatetime()));
 
                 if(runToUpdate.getImagePath() != null){
-                    new DownloadImageTask().execute(Config.getHost(getBaseContext()) + runToUpdate.getImagePath());
+                    Log.i("IMAGE", Config.getHost(getBaseContext()) + runToUpdate.getImagePath());
+                    Glide.with(this)
+                            .load(Config.getHost(getBaseContext()) + runToUpdate.getImagePath())
+                            .asBitmap().into(viewImage());
                 }
                 run.setId(runToUpdate.getId());
             }
@@ -217,6 +226,24 @@ public class RunEditActivity extends AppCompatActivity {
             }
         });
 
+        dateOfRun().setKeyListener(null);
+
+        dateOfRun().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerFragment().show(getSupportFragmentManager(), "datePicker");
+            }
+        });
+
+        timeOfRun().setKeyListener(null);
+
+        timeOfRun().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
+            }
+        });
+
         timeOfRun().setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -226,11 +253,12 @@ public class RunEditActivity extends AppCompatActivity {
             }
         });
 
+        durationOfRun().setKeyListener(null);
         durationOfRun().setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    new DurationPickerFragment().show(getFragmentManager(), "dialog");
+                    new DurationPickerFragment().show(getFragmentManager(), "durationPicker");
                 }
             }
         });
@@ -321,7 +349,11 @@ public class RunEditActivity extends AppCompatActivity {
         protected void onPostExecute(Integer code) {
             super.onPostExecute(code);
             if(code == 200){
-                Toast.makeText(getBaseContext(), "Corrida criada com sucesso", Toast.LENGTH_LONG).show();
+                if(run.getId() != null){
+                    Toast.makeText(getBaseContext(), "Corrida criada com sucesso", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getBaseContext(), "Corrida atualizada com sucesso", Toast.LENGTH_LONG).show();
+                }
                 finish();
             }else{
                 Toast.makeText(getBaseContext(), "Erro ao salvar corrida ", Toast.LENGTH_LONG).show();
@@ -335,10 +367,10 @@ public class RunEditActivity extends AppCompatActivity {
             MultiValueMap<String, Object> multipartRequest = new LinkedMultiValueMap<>();
             File f = null;
             if(buildRun.getBitmap() != null){
-                f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + ".jpg");
+                f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + ".png");
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 60, bos);
+                    buildRun.getBitmap().compress(Bitmap.CompressFormat.PNG, 50, bos);
                     byte[] bitmapdata = bos.toByteArray();
                     FileOutputStream fos = new FileOutputStream(f);
                     fos.write(bitmapdata);
@@ -350,7 +382,7 @@ public class RunEditActivity extends AppCompatActivity {
 
                 Resource resourceImg = new FileSystemResource(f);
                 HttpHeaders pictureHeader = new HttpHeaders();
-                pictureHeader.setContentType(MediaType.IMAGE_JPEG);
+                pictureHeader.setContentType(MediaType.IMAGE_PNG);
                 HttpEntity<Resource> picturePart = new HttpEntity<>(resourceImg, pictureHeader);
                 multipartRequest.add("rod_images_attributes[0][image]", picturePart);
             }
@@ -394,24 +426,6 @@ public class RunEditActivity extends AppCompatActivity {
 
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-
-        protected Bitmap doInBackground(String... urls) {
-            Bitmap runImage = null;
-            try {
-                InputStream in = new java.net.URL(urls[0]).openStream();
-                runImage = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return runImage;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            viewImage().setImageBitmap(result);
-        }
-    }
     private EditText kmsOfRun(){
         if(kmsRun == null)
             kmsRun = (EditText) findViewById(R.id.kmsRun);

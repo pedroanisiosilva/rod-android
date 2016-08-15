@@ -39,8 +39,6 @@ public class DurationPickerFragment extends TimeDurationPickerDialogFragment {
 
         ((EditText)getActivity().findViewById(R.id.durationRun)).setText(parseDateToHours(duration));
         ((EditText)getActivity().findViewById(R.id.durationRun)).setError(null);
-        ((EditText)getActivity().findViewById(R.id.durationRun)).clearFocus();
-
     }
     public static String parseDateToHours(long duration){
         duration = duration / 1000;

@@ -20,14 +20,14 @@
 
         <item name="colorButtonNormal">@color/primary_darker</item>
         <item name="android:colorButtonNormal">@color/primary_darker</item>
-        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@color/white</item>
 
         <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="AppTheme.Dark.Dialog" parent="Theme.AppCompat.Dialog">
-        <item name="colorAccent">@color/colorPrimaryDark</item>
-        <item name="android:textColorPrimary">@color/iron</item>
+        <item name="colorAccent">@color/topMenu</item>
+        <item name="android:textColorPrimary">@color/primary_dark</item>
         <item name="android:background">@color/white</item>
     </style>
 

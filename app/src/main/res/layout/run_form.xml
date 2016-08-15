@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/rod_main"
+    android:id="@+id/rod_run"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     >
     <com.theartofdev.edmodo.cropper.CropImageView
@@ -105,7 +105,6 @@
                 android:id="@+id/dateOfRun"
                 android:layout_width="151dp"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:hint="Data"
                 android:inputType="date|datetime"
                 android:textColor="@color/primary" />
@@ -115,7 +114,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:clickable="false">
 
             <EditText
                 android:id="@+id/timeOfRun"

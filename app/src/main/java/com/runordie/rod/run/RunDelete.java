@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.runordie.rod.helpers.Config;
 import com.runordie.rod.login.Login;
 
 import org.springframework.core.io.FileSystemResource;
@@ -43,11 +44,8 @@ public class RunDelete extends AsyncTask<String, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(String... urls) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-User-Email", Login.getLoginInfo(context)[0]);
-        headers.set("X-User-Token", Login.getLoginInfo(context)[1]);
 
-        HttpEntity<?> requestEntity = new HttpEntity<Object>(headers);
+        HttpEntity<?> requestEntity = new HttpEntity<Object>(Config.getHttpHeaders(context));
 
         RestTemplate restTemplate = new RestTemplate();
 

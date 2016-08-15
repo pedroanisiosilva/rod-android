@@ -34,16 +34,6 @@ public class Run implements Serializable {
     private Integer userId;
     private String imagePath;
 
-//    private HttpEntity<ByteArrayResource> img;
-//
-//    public HttpEntity<ByteArrayResource> getImg() {
-//        return img;
-//    }
-//
-//    public void setImg(HttpEntity<ByteArrayResource> img) {
-//        this.img = img;
-//    }
-
     public String getPace() {
         return pace;
     }
