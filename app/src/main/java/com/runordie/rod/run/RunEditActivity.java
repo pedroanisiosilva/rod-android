@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -42,6 +44,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -108,18 +112,58 @@ public class RunEditActivity extends AppCompatActivity {
 
     }
 
+    private Rect getCropBox(Uri uri){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(new File(uri.getPath()).getAbsolutePath(), options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        int boxSize = Math.min(imageHeight, imageWidth);
+
+        return new Rect(0, 0, boxSize, boxSize);
+
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
             return;
         }
-        if (requestCode == 1) {
-            final Bundle extras = data.getExtras();
-            if (extras != null) {
-                Bitmap runPhoro = extras.getParcelable("data");
-                viewImage().setImageBitmap(runPhoro);
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                try {
+                    Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), resultUri);
+                    viewImage().setImageBitmap(image);
+
+                } catch (IOException e) {
+//                Log.e(TAG, e.getMessage(),e);
+                }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
             }
+        }
+
+        if (requestCode == 1) {
+            Uri imageUri = data.getData();
+//            Bitmap image = BitmapFactory.decodeFile(imageUri.getPath());
+
+            try {
+                CropImage.activity(imageUri)
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .setInitialCropWindowRectangle(this.getCropBox(imageUri))
+                        .start(this);
+                Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+                viewImage().setImageBitmap(image);
+            } catch (IOException e) {
+//                Log.e(TAG, e.getMessage(),e);
+            }
+
+
         }
     }
 
@@ -141,15 +185,12 @@ public class RunEditActivity extends AppCompatActivity {
     public void pickImage() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        intent.putExtra("crop", "true");
-        intent.putExtra("scale", true);
-        intent.putExtra("outputX", 256);
-        intent.putExtra("outputY", 256);
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
         intent.putExtra("return-data", true);
         startActivityForResult(intent, 1);
+
     }
+
+
 
     private void setOnClicks(){
 
@@ -297,7 +338,7 @@ public class RunEditActivity extends AppCompatActivity {
                 f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + ".jpg");
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 70, bos);
+                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 60, bos);
                     byte[] bitmapdata = bos.toByteArray();
                     FileOutputStream fos = new FileOutputStream(f);
                     fos.write(bitmapdata);
