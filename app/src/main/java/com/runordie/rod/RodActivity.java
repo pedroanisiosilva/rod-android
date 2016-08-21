@@ -203,7 +203,7 @@ public class RodActivity extends AppCompatActivity {
     }
 
     private void registerAppManger() {
-//        MetricsManager.register(this, getApplication());
-//        CrashManager.register(this);
+        MetricsManager.register(this, getApplication());
+        CrashManager.register(this);
     }
 }
