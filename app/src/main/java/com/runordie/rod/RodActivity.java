@@ -29,6 +29,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 //hockeyapp
@@ -61,10 +62,6 @@ public class RodActivity extends AppCompatActivity {
                 swipeContainer.setRefreshing(false);
             }
         });
-
-//        swipeContainer.setColorSchemeResources(R.color.primary, android.R.color.holo_green_light,
-//                                                android.R.color.holo_orange_light,
-//                                                android.R.color.holo_red_light);
 
     }
     private void updateRuns(boolean showLoading){
@@ -130,10 +127,6 @@ public class RodActivity extends AppCompatActivity {
             this.finish();
             return true;
         }
-//        if (id == R.id.user_setting) {
-//            startActivity(new Intent(this, UserActivity.class));
-//            return false;
-//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -162,8 +155,21 @@ public class RodActivity extends AppCompatActivity {
                     startActivity(new Intent(getBaseContext(), RodLoginActivity.class));
                     finish();
                 }
+            }catch (ResourceAccessException e){
+                displayExceptionMessage();
+                e.printStackTrace();
             }
+
             return null;
+        }
+
+        public void displayExceptionMessage() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "Erro ao carregar corridas", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         @Override
@@ -197,7 +203,7 @@ public class RodActivity extends AppCompatActivity {
     }
 
     private void registerAppManger() {
-        MetricsManager.register(this, getApplication());
-        CrashManager.register(this);
+//        MetricsManager.register(this, getApplication());
+//        CrashManager.register(this);
     }
 }

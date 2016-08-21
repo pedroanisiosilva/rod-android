@@ -48,6 +48,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -80,6 +81,7 @@ public class RunEditActivity extends AppCompatActivity {
     private EditText descriptionRun;
     private ImageView photo;
     private Run run = new Run();
+    private String TAG = "RunEdit";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,8 +358,10 @@ public class RunEditActivity extends AppCompatActivity {
                 }
                 finish();
             }else{
-                Toast.makeText(getBaseContext(), "Erro ao salvar corrida ", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "Erro ao salvar corrida", Toast.LENGTH_SHORT).show();
             }
+            ((RelativeLayout)findViewById(R.id.loadingPanel)).setVisibility(View.GONE);
+
         }
 
         @Override
@@ -407,14 +411,16 @@ public class RunEditActivity extends AppCompatActivity {
             int code = 0;
 
             ResponseEntity<Object> result;
-
-            if(run.getId() != null){
-                result = restTemplate.exchange(urls[0], HttpMethod.PUT, requestEntity, Object.class);
-            }else{
-                result = restTemplate.exchange(urls[0], HttpMethod.POST, requestEntity, Object.class);
+            try {
+                if(run.getId() != null){
+                    result = restTemplate.exchange(urls[0], HttpMethod.PUT, requestEntity, Object.class);
+                }else{
+                    result = restTemplate.exchange(urls[0], HttpMethod.POST, requestEntity, Object.class);
+                }
+                code = result.getStatusCode().value();
+            }catch (ResourceAccessException e){
+                e.printStackTrace();
             }
-
-            code = result.getStatusCode().value();
 
             if(f != null){
                 f.delete();
@@ -424,7 +430,10 @@ public class RunEditActivity extends AppCompatActivity {
 
         }
 
+
+
     }
+
 
     private EditText kmsOfRun(){
         if(kmsRun == null)
