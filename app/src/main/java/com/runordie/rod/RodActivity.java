@@ -127,6 +127,10 @@ public class RodActivity extends AppCompatActivity {
             this.finish();
             return true;
         }
+//        if (id == R.id.user_setting) {
+//            startActivity(new Intent(this, UserActivity.class));
+//            return false;
+//        }
 
         return super.onOptionsItemSelected(item);
     }

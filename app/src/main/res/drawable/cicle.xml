@@ -6,7 +6,7 @@
     <solid android:color="@android:color/transparent" />
 
     <stroke
-        android:width="15dp"
-        android:color="@color/white" />
+        android:width="10dp"
+        android:color="#d7c9fc" />
 
 </shape>

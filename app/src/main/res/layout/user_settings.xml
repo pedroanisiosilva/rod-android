@@ -41,23 +41,6 @@
                 android:textColor="@color/primary" />
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
-
-            <EditText
-                android:id="@+id/userNickname"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Nickname"
-                android:inputType="text"
-                android:textColor="@color/primary" />
-        </android.support.design.widget.TextInputLayout>
-
-
-
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -68,9 +51,9 @@
                     android:id="@+id/userCellphone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:hint="Cellphone"
-                    android:inputType="date|datetime"
+                    android:inputType="phone"
+                    android:maxLength="12"
                     android:textColor="@color/primary" />
             </android.support.design.widget.TextInputLayout>
 
