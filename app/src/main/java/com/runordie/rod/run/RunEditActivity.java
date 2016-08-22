@@ -256,6 +256,7 @@ public class RunEditActivity extends AppCompatActivity {
         });
 
         durationOfRun().setKeyListener(null);
+
         durationOfRun().setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -264,7 +265,12 @@ public class RunEditActivity extends AppCompatActivity {
                 }
             }
         });
-
+        durationOfRun().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DurationPickerFragment().show(getFragmentManager(), "durationPicker");
+            }
+        });
 
     }
 
