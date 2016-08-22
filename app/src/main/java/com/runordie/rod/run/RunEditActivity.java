@@ -51,6 +51,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import com.runordie.rod.run.views.RunEditViewActions;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
@@ -72,22 +73,14 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by wsouza on 7/9/16.
  */
-public class RunEditActivity extends AppCompatActivity {
-
-    private EditText datePicker;
-    private EditText timePicker;
-    private EditText kmsRun;
-    private EditText durationRun;
-    private EditText descriptionRun;
-    private ImageView photo;
-    private Run run = new Run();
-    private String TAG = "RunEdit";
+public class RunEditActivity extends RunEditViewActions {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Inflate the layout for this fragment
         setContentView(R.layout.run_form);
+
         setOnClicks();
 
         Bundle extras = getIntent().getExtras();
@@ -97,7 +90,6 @@ public class RunEditActivity extends AppCompatActivity {
             if(runToUpdate != null){
                 Calendar cal = Calendar.getInstance();
                 TimeZone tz = cal.getTimeZone();
-
 
                 kmsOfRun().setText(runToUpdate.getDistance().toString());
                 descriptionOfRun().setText(runToUpdate.getNote());
@@ -117,21 +109,9 @@ public class RunEditActivity extends AppCompatActivity {
                             .load(Config.getHost(getBaseContext()) + runToUpdate.getImagePath())
                             .asBitmap().into(viewImage());
                 }
-                run.setId(runToUpdate.getId());
+                getRun().setId(runToUpdate.getId());
             }
         }
-
-    }
-
-    private Rect getCropBox(Uri uri){
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(new File(uri.getPath()).getAbsolutePath(), options);
-        int imageHeight = options.outHeight;
-        int imageWidth = options.outWidth;
-        int boxSize = Math.min(imageHeight, imageWidth);
-
-        return new Rect(0, 0, boxSize, boxSize);
 
     }
 
@@ -178,12 +158,13 @@ public class RunEditActivity extends AppCompatActivity {
         }
     }
 
-    private void doCreateRun() {
+    @Override
+    protected void doCreateRun() {
         if(new Validation().isValid()){
             try {
                 BuildRun buildRun = new BuildRun().build();
-                if(run.getId() != null){
-                    new RunPost(buildRun).execute(Config.getRunDUUrl(this, run.getId()));
+                if(getRun().getId() != null){
+                    new RunPost(buildRun).execute(Config.getRunDUUrl(this, getRun().getId()));
                 }else{
                     new RunPost(buildRun).execute(Config.getRunPostUrl(this));
                 }
@@ -193,86 +174,6 @@ public class RunEditActivity extends AppCompatActivity {
         }
     }
 
-    public void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        intent.putExtra("return-data", true);
-        startActivityForResult(intent, 1);
-
-    }
-
-
-
-    private void setOnClicks(){
-
-        findViewById(R.id.btnAddRun).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doCreateRun();
-            }
-        });
-
-        viewImage().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickImage();
-            }
-        });
-
-        dateOfRun().setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    new DatePickerFragment().show(getSupportFragmentManager(), "datePicker");
-                }
-            }
-        });
-
-        dateOfRun().setKeyListener(null);
-
-        dateOfRun().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerFragment().show(getSupportFragmentManager(), "datePicker");
-            }
-        });
-
-        timeOfRun().setKeyListener(null);
-
-        timeOfRun().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
-            }
-        });
-
-        timeOfRun().setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    new TimePickerFragment().show(getSupportFragmentManager(), "timePicker");
-                }
-            }
-        });
-
-        durationOfRun().setKeyListener(null);
-
-        durationOfRun().setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    new DurationPickerFragment().show(getFragmentManager(), "durationPicker");
-                }
-            }
-        });
-        durationOfRun().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DurationPickerFragment().show(getFragmentManager(), "durationPicker");
-            }
-        });
-
-    }
 
     private class BuildRun {
         private Bitmap bitmap = null;
@@ -295,48 +196,15 @@ public class RunEditActivity extends AppCompatActivity {
 
             long parsedDuration = DurationPickerFragment.parseDuration(duration);
             String userId = Login.getLoginInfo(getBaseContext())[2];
-            run.setDatetime(data);
-            run.setUserId(Integer.parseInt(userId));
-            run.setDuration(DurationPickerFragment.parseDuration(duration));
-            run.setDistance(kms);
-            run.setNote(descriptionOfRun().getText().toString());
+            getRun().setDatetime(data);
+            getRun().setUserId(Integer.parseInt(userId));
+            getRun().setDuration(DurationPickerFragment.parseDuration(duration));
+            getRun().setDistance(kms);
+            getRun().setNote(descriptionOfRun().getText().toString());
             if(viewImage().getDrawable() != null){
                 bitmap = ((BitmapDrawable)viewImage().getDrawable()).getBitmap();
             }
             return this;
-        }
-    }
-
-    public class Validation {
-
-        public boolean isValid(){
-            boolean valid = true;
-
-            if(descriptionOfRun().getText().toString().trim().isEmpty()){
-                descriptionOfRun().setError("Description is required!!!");
-                valid = false;
-            }
-
-            if(kmsOfRun().getText().toString().trim().isEmpty() || kmsOfRun().getText().toString().trim().matches("")){
-                kmsOfRun().setError("Km`s is required!!!");
-                valid = false;
-            }
-
-            if(durationOfRun().getText().toString().trim().isEmpty()){
-                durationOfRun().setError("Duration is required!!!");
-                valid = false;
-            }
-
-            if(dateOfRun().getText().toString().trim().isEmpty()){
-                dateOfRun().setError("Date is required!!!");
-                valid = false;
-            }
-            if(timeOfRun().getText().toString().trim().isEmpty()){
-                timeOfRun().setError("Time is required!!!");
-                valid = false;
-            }
-
-            return valid;
         }
     }
 
@@ -357,7 +225,7 @@ public class RunEditActivity extends AppCompatActivity {
         protected void onPostExecute(Integer code) {
             super.onPostExecute(code);
             if(code == 200){
-                if(run.getId() != null){
+                if(getRun().getId() != null){
                     Toast.makeText(getBaseContext(), "Corrida criada com sucesso", Toast.LENGTH_LONG).show();
                 }else{
                     Toast.makeText(getBaseContext(), "Corrida atualizada com sucesso", Toast.LENGTH_LONG).show();
@@ -377,7 +245,8 @@ public class RunEditActivity extends AppCompatActivity {
             MultiValueMap<String, Object> multipartRequest = new LinkedMultiValueMap<>();
             File f = null;
             if(buildRun.getBitmap() != null){
-                f = new File(getBaseContext().getCacheDir(), run.getDatetime().getTime() + run.getUserId() + ".png");
+                // fazer refactory para buildRun ter uma instancia nova de Run
+                f = new File(getBaseContext().getCacheDir(), getRun().getDatetime().getTime() + getRun().getUserId() + ".png");
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     buildRun.getBitmap().compress(Bitmap.CompressFormat.PNG, 50, bos);
@@ -400,10 +269,10 @@ public class RunEditActivity extends AppCompatActivity {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-            multipartRequest.add("datetime", sdf.format(run.getDatetime()));
-            multipartRequest.add("distance", run.getDistance());
-            multipartRequest.add("duration", run.getDuration() / 1000);
-            multipartRequest.add("note", run.getNote());
+            multipartRequest.add("datetime", sdf.format(getRun().getDatetime()));
+            multipartRequest.add("distance", getRun().getDistance());
+            multipartRequest.add("duration", getRun().getDuration() / 1000);
+            multipartRequest.add("note", getRun().getNote());
 
             HttpMessageConverter<Object> jackson = new MappingJackson2HttpMessageConverter();
             HttpMessageConverter<Resource> resource = new ResourceHttpMessageConverter();
@@ -418,7 +287,7 @@ public class RunEditActivity extends AppCompatActivity {
 
             ResponseEntity<Object> result;
             try {
-                if(run.getId() != null){
+                if(getRun().getId() != null){
                     result = restTemplate.exchange(urls[0], HttpMethod.PUT, requestEntity, Object.class);
                 }else{
                     result = restTemplate.exchange(urls[0], HttpMethod.POST, requestEntity, Object.class);
@@ -435,46 +304,6 @@ public class RunEditActivity extends AppCompatActivity {
             return code;
 
         }
-
-
-
-    }
-
-
-    private EditText kmsOfRun(){
-        if(kmsRun == null)
-            kmsRun = (EditText) findViewById(R.id.kmsRun);
-        return kmsRun;
-    }
-
-    private EditText durationOfRun(){
-        if(durationRun == null)
-            durationRun = (EditText) findViewById(R.id.durationRun);
-        return durationRun;
-    }
-
-    private EditText descriptionOfRun(){
-        if(descriptionRun == null)
-            descriptionRun = (EditText) findViewById(R.id.descriptionRun);
-        return descriptionRun;
-    }
-
-    private EditText dateOfRun(){
-        if(datePicker == null)
-            datePicker = (EditText) findViewById(R.id.dateOfRun);
-        return datePicker;
-    }
-
-    private ImageView viewImage() {
-        if(photo == null)
-            photo = (ImageView) findViewById(R.id.runPhoto);
-        return photo;
-    }
-
-    private EditText timeOfRun(){
-        if(timePicker == null)
-            timePicker = (EditText) findViewById(R.id.timeOfRun);
-        return timePicker;
     }
 
 }
