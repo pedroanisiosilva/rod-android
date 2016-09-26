@@ -246,10 +246,10 @@ public class RunEditActivity extends RunEditViewActions {
             File f = null;
             if(buildRun.getBitmap() != null){
                 // fazer refactory para buildRun ter uma instancia nova de Run
-                f = new File(getBaseContext().getCacheDir(), getRun().getDatetime().getTime() + getRun().getUserId() + ".png");
+                f = new File(getBaseContext().getCacheDir(), getRun().getDatetime().getTime() + getRun().getUserId() + ".jpeg");
                 try {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    buildRun.getBitmap().compress(Bitmap.CompressFormat.PNG, 50, bos);
+                    buildRun.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, bos);
                     byte[] bitmapdata = bos.toByteArray();
                     FileOutputStream fos = new FileOutputStream(f);
                     fos.write(bitmapdata);
@@ -261,7 +261,7 @@ public class RunEditActivity extends RunEditViewActions {
 
                 Resource resourceImg = new FileSystemResource(f);
                 HttpHeaders pictureHeader = new HttpHeaders();
-                pictureHeader.setContentType(MediaType.IMAGE_PNG);
+                pictureHeader.setContentType(MediaType.IMAGE_JPEG);
                 HttpEntity<Resource> picturePart = new HttpEntity<>(resourceImg, pictureHeader);
                 multipartRequest.add("rod_images_attributes[0][image]", picturePart);
             }
